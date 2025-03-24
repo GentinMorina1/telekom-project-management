@@ -1,0 +1,68 @@
+/* Dashboard.css */
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 40px;
+  color: #333;
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.uploaded-files-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.uploaded-files-list li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.uploaded-files-list li button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.uploaded-files-list li button:hover {
+  background-color: #0056b3;
+}
+
+.uploaded-files-list li strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.uploaded-files-list li span {
+  font-size: 12px;
+  color: #777;
+}

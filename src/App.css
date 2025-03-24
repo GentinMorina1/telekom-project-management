@@ -1,0 +1,30 @@
+.dashboard {
+  padding: 30px;
+}
+
+.dashboard h1 {
+  color: #007bff;
+}
+
+.dashboard .card {
+  border-radius: 10px;
+}
+
+.dashboard .card-title {
+  font-weight: bold;
+}
+
+.dashboard .card-text {
+  color: #6c757d;
+}
+
+.dashboard .btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.dashboard .btn-primary:hover {
+  background-color: #0056b3;
+}

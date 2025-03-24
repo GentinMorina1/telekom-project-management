@@ -1,0 +1,126 @@
+/* Dashboard.css */
+
+/* Body Background and General Styling */
+body {
+  background-color: #f5f5f5;  /* Light gray background */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dashboard container styling */
+.dashboard-container {
+  background-color: white;  /* White background for the dashboard */
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling */
+.dashboard-title {
+  text-align: center;
+  font-size: 36px;
+  color: #0056b3;  /* Dark blue for the title */
+  margin-bottom: 20px;
+}
+
+/* Logo Container */
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Vala Logo Styling */
+.vala-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/* Search Input and Filters */
+.dashboard-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 50%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.priority-filter {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Add Project Button */
+button {
+  background-color: #0056b3;  /* Dark blue */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #003f75;  /* Darker blue on hover */
+}
+
+/* Table Styling */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #0056b3;  /* Dark blue */
+  color: white;
+  font-size: 18px;
+}
+
+.styled-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.styled-table td {
+  color: #333;
+}
+
+/* Modal Styles */
+.modal-header {
+  background-color: #0056b3;  /* Dark blue */
+  color: white;
+}
+
+.modal-footer {
+  background-color: #f5f5f5;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer button {
+  background-color: #0056b3;
+  color: white;
+}
+
+.modal-footer button:hover {
+  background-color: #003f75;
+}
