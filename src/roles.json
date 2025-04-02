@@ -13,5 +13,10 @@
     "email": "user@example.com",
     "role": "user",
     "password": "user123"
+  },
+  {
+    "email": "gentin@example.com",
+    "role": "gentin",
+    "password": "gentin123"
   }
 ]

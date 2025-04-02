@@ -2,100 +2,117 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Table, Col, Row, Container, Modal } from 'react-bootstrap';
 
 const Dashboard = ({ user }) => {
-  // State for all projects and filtered projects
   const [allProjects, setAllProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Controls modal visibility
+  const [showModal, setShowModal] = useState(false);
   const [projectForm, setProjectForm] = useState({
     name: '',
     description: '',
     priority: 'Medium',
-    status: 'Pending', // Default status
+    status: 'Pending',
     comments: '',
   });
+  const [editingProject, setEditingProject] = useState(null); // State to track the project being edited
+  const [filters, setFilters] = useState({ name: '', priority: '', status: '', createdBy: '' });
 
   useEffect(() => {
-    // Load projects from localStorage if they exist
     const savedProjects = JSON.parse(localStorage.getItem('projects')) || [];
     setAllProjects(savedProjects);
     setFilteredProjects(savedProjects);
   }, []);
 
-  // Handle creating a new project
+  useEffect(() => {
+    let projects = allProjects;
+    if (filters.name) {
+      projects = projects.filter((p) => p.name && p.name.toLowerCase().includes(filters.name.toLowerCase()));
+    }
+    if (filters.priority) {
+      projects = projects.filter((p) => p.priority === filters.priority);
+    }
+    if (filters.status) {
+      projects = projects.filter((p) => p.status === filters.status);
+    }
+    if (filters.createdBy) {
+      projects = projects.filter((p) => p.createdBy && p.createdBy.toLowerCase().includes(filters.createdBy.toLowerCase()));
+    }
+    setFilteredProjects(projects);
+  }, [filters, allProjects]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
   const handleCreateProject = () => {
     if (!projectForm.name.trim()) {
       alert('Please enter a project name.');
       return;
     }
-
     const newProject = {
       id: allProjects.length + 1,
-      ...projectForm, // Include form data
+      ...projectForm,
+      createdBy: user.email,
     };
-
     const updatedProjects = [...allProjects, newProject];
     setAllProjects(updatedProjects);
-    setFilteredProjects(updatedProjects);
-    localStorage.setItem('projects', JSON.stringify(updatedProjects)); // Save to localStorage
-
-    setShowModal(false); // Close the modal after creating project
-    setProjectForm({ name: '', description: '', priority: 'Medium', status: 'Pending', comments: '' }); // Reset form
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    setShowModal(false);
+    setProjectForm({ name: '', description: '', priority: 'Medium', status: 'Pending', comments: '' });
   };
 
-  // Handle updating the procurement status
+  const handleDeleteProject = (id) => {
+    const updatedProjects = allProjects.filter((p) => p.id !== id);
+    setAllProjects(updatedProjects);
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+  };
+
   const handlePassedProcurement = (id) => {
-    const updatedProjects = allProjects.map((project) =>
-      project.id === id ? { ...project, status: 'Passed Procurement' } : project
+    const updatedProjects = allProjects.map((p) =>
+      p.id === id ? { ...p, status: 'Passed Procurement' } : p
     );
     setAllProjects(updatedProjects);
-    setFilteredProjects(updatedProjects);
-    localStorage.setItem('projects', JSON.stringify(updatedProjects)); // Save to localStorage
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
   };
 
-  // Handle filtering based on priority, name, and procurement status
-  const handleFilter = (e) => {
-    const { name, value } = e.target;
-    const updatedProjects = allProjects.filter((project) =>
-      project[name].toLowerCase().includes(value.toLowerCase())
+  // Handle Edit Button Click
+  const handleEditProject = (project) => {
+    setEditingProject(project);
+    setProjectForm({ ...project });
+    setShowModal(true); // Open the modal
+  };
+
+  const handleUpdateProject = () => {
+    if (!projectForm.name.trim()) {
+      alert('Please enter a project name.');
+      return;
+    }
+    const updatedProjects = allProjects.map((p) =>
+      p.id === editingProject.id ? { ...editingProject, ...projectForm } : p
     );
-    setFilteredProjects(updatedProjects);
+    setAllProjects(updatedProjects);
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    setShowModal(false);
+    setEditingProject(null);
+    setProjectForm({ name: '', description: '', priority: 'Medium', status: 'Pending', comments: '' });
   };
 
   return (
     <Container>
       <h1 className="my-4">Dashboard</h1>
 
-      {/* Project Filter */}
+      {/* Filters */}
       <Row className="mb-4">
-        <Col md={4}>
-          <Form.Control
-            type="text"
-            name="name"
-            placeholder="Search by name"
-            onChange={handleFilter}
-          />
-        </Col>
-        <Col md={4}>
-          <Form.Control as="select" name="priority" onChange={handleFilter}>
-            <option value="">Select Priority</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </Form.Control>
-        </Col>
-        <Col md={4}>
-          <Form.Control as="select" name="status" onChange={handleFilter}>
-            <option value="">Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Passed Procurement">Passed Procurement</option>
-          </Form.Control>
-        </Col>
+        <Col md={3}><Form.Control type="text" placeholder="Search by Name" name="name" onChange={handleFilterChange} /></Col>
+        <Col md={3}><Form.Select name="priority" onChange={handleFilterChange}><option value="">Priority</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></Form.Select></Col>
+        <Col md={3}><Form.Select name="status" onChange={handleFilterChange}><option value="">Status</option><option value="Pending">Pending</option><option value="Passed Procurement">Passed Procurement</option></Form.Select></Col>
+        <Col md={3}><Form.Control type="text" placeholder="Filter by Creator" name="createdBy" onChange={handleFilterChange} /></Col>
       </Row>
 
-      {/* Button to Open Modal */}
       <Button variant="success" onClick={() => setShowModal(true)}>New Project</Button>
 
-      {/* Projects Table */}
       <h3 className="mt-5">Project List</h3>
       <Table striped bordered hover className="mt-3">
         <thead>
@@ -106,6 +123,7 @@ const Dashboard = ({ user }) => {
             <th>Priority</th>
             <th>Status</th>
             <th>Comments</th>
+            <th>Created By</th>
             {user.role === 'admin' && <th>Actions</th>}
           </tr>
         </thead>
@@ -118,17 +136,14 @@ const Dashboard = ({ user }) => {
               <td>{project.priority}</td>
               <td>{project.status}</td>
               <td>{project.comments}</td>
+              <td>{project.createdBy}</td>
               {user.role === 'procurement' && project.status !== 'Passed Procurement' && (
-                <td>
-                  <Button variant="primary" onClick={() => handlePassedProcurement(project.id)}>
-                    Passed Procurement
-                  </Button>
-                </td>
+                <td><Button variant="primary" onClick={() => handlePassedProcurement(project.id)}>Passed Procurement</Button></td>
               )}
               {user.role === 'admin' && (
                 <td>
-                  <Button variant="danger" className="me-2">Delete</Button>
-                  <Button variant="warning">Edit</Button>
+                  <Button variant="danger" className="me-2" onClick={() => handleDeleteProject(project.id)}>Delete</Button>
+                  <Button variant="warning" onClick={() => handleEditProject(project)}>Edit</Button>
                 </td>
               )}
             </tr>
@@ -136,74 +151,41 @@ const Dashboard = ({ user }) => {
         </tbody>
       </Table>
 
-      {/* Modal for Creating Project */}
+      {/* Create or Edit Project Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Create a New Project</Modal.Title>
+          <Modal.Title>{editingProject ? 'Edit Project' : 'Create a New Project'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Row className="mb-3">
-              <Col md={12}>
-                <Form.Group controlId="formProjectName">
-                  <Form.Label>Project Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={projectForm.name}
-                    onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                    placeholder="Enter project name"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row className="mb-3">
-              <Col md={12}>
-                <Form.Group controlId="formProjectDescription">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={projectForm.description}
-                    onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
-                    placeholder="Enter description"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="formProjectPriority">
-                  <Form.Label>Priority</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={projectForm.priority}
-                    onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value })}
-                  >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </Form.Control>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="formProjectComments">
-                  <Form.Label>Comments</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    value={projectForm.comments}
-                    onChange={(e) => setProjectForm({ ...projectForm, comments: e.target.value })}
-                    placeholder="Enter comments"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+            <Form.Group className="mb-3">
+              <Form.Label>Project Name</Form.Label>
+              <Form.Control type="text" value={projectForm.name} onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control type="text" value={projectForm.description} onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Priority</Form.Label>
+              <Form.Select value={projectForm.priority} onChange={(e) => setProjectForm({ ...projectForm, priority: e.target.value })}>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </Form.Select>
+            </Form.Group>
+         
+            <Form.Group className="mb-3">
+              <Form.Label>Comments</Form.Label>
+              <Form.Control type="text" value={projectForm.comments} onChange={(e) => setProjectForm({ ...projectForm, comments: e.target.value })} />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={handleCreateProject}>Create Project</Button>
+          <Button variant="primary" onClick={editingProject ? handleUpdateProject : handleCreateProject}>
+            {editingProject ? 'Update Project' : 'Create Project'}
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>
